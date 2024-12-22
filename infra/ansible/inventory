@@ -1,0 +1,2 @@
+[myhosts]
+xx.xx.xx.xx ansible_user=ubuntu

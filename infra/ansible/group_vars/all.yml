@@ -1,0 +1,4 @@
+express_app_directory: "/home/ubuntu/express-helloworld"
+express_app_repo: "https://github.com/kshn01/sample-app.git"
+node_version: "14.x"
+nginx_conf_file: "/etc/nginx/conf.d/express-app.conf"

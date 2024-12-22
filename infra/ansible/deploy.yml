@@ -1,0 +1,93 @@
+---
+- name: Deploy Express App with Nginx Proxy on Ubuntu EC2
+  hosts: myhosts
+  become: yes
+  tasks:
+
+    # Step 1: Update the system
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+
+    # Step 2: Install required packages (Node.js, Nginx, Git)
+    - name: Install required packages (Node.js, Nginx, Git)
+      apt:
+        name:
+          - nodejs
+          - npm
+          - nginx
+          - git
+        state: present
+
+    # Step 3: Install Node.js from Nodesource
+    - name: Install Node.js 14.x from Nodesource
+      shell: curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+      args:
+        creates: /usr/bin/node
+
+    # Step 4: Clone the Express app from Git
+    - name: Clone the Express app repository
+      git:
+        repo: "{{ express_app_repo }}"
+        dest: "{{ express_app_directory }}"
+        version: main
+
+    # Step 5: Install app dependencies
+    - name: Install app dependencies using npm
+      npm:
+        path: "{{ express_app_directory }}"
+        state: present
+
+    # Step 6: Install PM2 to manage the Express app
+    - name: Install PM2 globally
+      npm:
+        name: pm2
+        global: yes
+
+    - name: Start the Express app using PM2
+      shell: pm2 start {{ express_app_directory }}/index.js --name express-app
+      args:
+        chdir: "{{ express_app_directory }}"
+
+    # Step 7: Configure Nginx as a reverse proxy
+    - name: Configure Nginx to proxy requests to the Express app
+      template:
+        src: nginx.conf.j2
+        dest: "/etc/nginx/sites-available/express-app"
+      notify:
+        - restart nginx
+
+    # Step 8: Remove the default Nginx page
+    - name: Remove default Nginx page
+      file:
+        path: /var/www/html/index.nginx-debian.html
+        state: absent
+
+    # Step 9: Remove default Nginx site configuration
+    - name: Remove default Nginx site configuration
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    # Step 10: Enable and start Nginx service
+    - name: Create symlink for Nginx site
+      file:
+        src: "/etc/nginx/sites-available/express-app"
+        dest: "/etc/nginx/sites-enabled/express-app"
+        state: link
+
+    - name: Start and enable Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
