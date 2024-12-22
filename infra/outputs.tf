@@ -8,5 +8,10 @@ output "subnet_id" {
 }
 
 output "instance_id" {
-  value = aws_instance.app_server.tags.Name
+  value = aws_instance.web[0].id
+}
+
+output "name" {
+  value = aws_instance.web[0].public_ip
+  
 }

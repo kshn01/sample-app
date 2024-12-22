@@ -13,11 +13,17 @@ variable "instance_type" {
 variable "instance_ami" {
   description = "The AMI to use for the instance"
   type        = string
-  default     = "ami-0c55b159cbfafe1f0"
+  default     = "ami-0e2c8caa4b6378d8c"
 }
 
 variable "instance_name" {
   description = "The name of the instance"
   type        = string
   default     = "PublicInstance"
+}
+
+variable "key_name" {
+  description = "The name of the EC2 key pair"
+  type        = string
+  default = "my-key"
 }

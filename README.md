@@ -11,6 +11,6 @@ docker run -p 3000:3000 webclues-sample
 
 Notes:
 
-`/infra` for terraform code.
+`/infra` for Task 3.
 
-`/kubernetes` for kubernetes manifests.
+`/kubernetes` for Task 2.
